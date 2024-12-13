@@ -1,9 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addToWishApi } from "../api/wishListApi";
-import { addToCartApi } from "../api/cartApi";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  addToWishApi,
+  getWishCount,
+  getWishListApi,
+  removerWishItem,
+} from "../api/wishListApi";
+import { addToCartApi, getCart } from "../api/cartApi";
 import { toast, Toaster } from "sonner";
+import Cookies from "js-cookie";
 
 const BookCard = ({ book, addToCart }) => {
   const queryClient = useQueryClient();
@@ -13,7 +19,7 @@ const BookCard = ({ book, addToCart }) => {
     mutationFn: addToCartApi,
     onSuccess: (data) => {
       // update cart count
-      // queryClient.invalidateQueries({ queryKey: [""] });
+      queryClient.invalidateQueries({ queryKey: ["getCart"] });
 
       toast.success("sucsessfully add to cart");
     },
@@ -28,11 +34,26 @@ const BookCard = ({ book, addToCart }) => {
     mutateAddToCart(formData);
   };
 
+  const { data: cartItems } = useQuery({
+    queryKey: ["getCart"],
+    queryFn: getCart,
+    enabled: Cookies.get("token") === undefined ? false : true,
+  });
+
+  const isCartBook = cartItems?.data
+    .map((book) => book.bookId)
+    .includes(book.id);
+
   // Handle Add to Wishlist
   const { mutate } = useMutation({
     mutationFn: addToWishApi,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["wishListCount"] });
+      queryClient.invalidateQueries({
+        queryKey: ["wishListCount"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["getWishListByUser"],
+      });
 
       toast.success("sucsessfully");
     },
@@ -45,9 +66,22 @@ const BookCard = ({ book, addToCart }) => {
     formData.append("bookId", book.id);
     mutate(formData);
   };
+
+  const { data } = useQuery({
+    queryKey: ["getWishListByUser"],
+    queryFn: getWishListApi,
+    enabled: Cookies.get("token") === undefined ? false : true,
+  });
+
+  const isWishListItem = data?.data
+    .map((item) => item.book.id)
+    .includes(book.id);
+  const isUser = Cookies.get("token");
+  const navigate = useNavigate();
   return (
     <div className="p-4 border rounded shadow">
       <Toaster richColors position="bottom-right" />
+      <p>{book.id}</p>
       <img
         src={book.image}
         alt={book.title}
@@ -60,18 +94,24 @@ const BookCard = ({ book, addToCart }) => {
 
       {/* Add to Cart Button */}
       <button
-        onClick={handleAddToCart}
-        className={`block w-full mt-2 py-2 px-4 rounded bg-blue-500 hover:bg-blue-600  text-white`}
+        disabled={isCartBook}
+        onClick={() =>
+          isUser === undefined ? navigate("/signin") : handleAddToCart()
+        }
+        className={`disabled:bg-slate-500 block w-full mt-2 py-2 px-4 rounded bg-blue-500 hover:bg-blue-600  text-white`}
       >
-        Add to Cart
+        {isCartBook ? "already adedd to cart " : "Add to cart"}
       </button>
 
       {/* Add to Wishlist Button */}
       <button
-        onClick={handleAddToWishlist}
-        className={`block w-full  mt-2 py-2 px-4 rounded bg-yellow-500 hover:bg-yellow-600 text-white`}
+        disabled={isWishListItem}
+        onClick={() =>
+          isUser === undefined ? navigate("/signin") : handleAddToWishlist()
+        }
+        className={`disabled:bg-slate-600 block w-full  mt-2 py-2 px-4 rounded bg-yellow-500 hover:bg-yellow-600 text-white`}
       >
-        Add to Wishlist
+        {isWishListItem ? "already adedd to wish list" : "Add to Wishlist"}
       </button>
       {/*veiw Button */}
       <Link

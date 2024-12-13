@@ -11,6 +11,8 @@ import Profile from "./pages/Profile";
 import BooksList from "./components/BookList";
 import BookDetail from "./components/BookDetail";
 import WishList from "./pages/WishList";
+import Cart from "./pages/Cart";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -31,7 +33,11 @@ const router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/books/:id",
@@ -40,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: "wishlist",
         element: <WishList />,
+      },
+      {
+        path: "cart",
+        element: <Cart />,
       },
     ],
   },

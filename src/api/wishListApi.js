@@ -5,6 +5,7 @@ export const addToWishApi = async (data) => {
   return response.data;
 };
 
+// problem with API
 export const removerWishItem = async (data) => {
   const response = await axiosClient.post("/wishlist/remove", data);
   return response.data;

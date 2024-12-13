@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Filters({ filters, handleChange }) {
+export default function Filters({ filters, handleChange, isLoading }) {
   return (
     <div className="mb-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Category Filter */}
@@ -9,6 +9,7 @@ export default function Filters({ filters, handleChange }) {
           Category
         </label>
         <input
+          disabled={isLoading}
           type="text"
           name="category"
           value={filters.category}
@@ -24,6 +25,7 @@ export default function Filters({ filters, handleChange }) {
           Min Price
         </label>
         <input
+          disabled={isLoading}
           type="number"
           name="minPrice"
           value={filters.minPrice}
@@ -38,6 +40,7 @@ export default function Filters({ filters, handleChange }) {
           Max Price
         </label>
         <input
+          disabled={isLoading}
           type="number"
           name="maxPrice"
           value={filters.maxPrice}

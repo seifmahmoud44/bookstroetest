@@ -2,6 +2,7 @@ import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { getUserApi, updateUserApi } from "../api/authApi";
+import { toast, Toaster } from "sonner";
 
 const Profile = () => {
   // Fetch user data
@@ -20,16 +21,18 @@ const Profile = () => {
   }, [userData, setValue]);
 
   // Mutation for updating user data
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: updateUserApi,
     onSuccess: () => {
       QueryClient.invalidateQueries({ queryKey: ["user"] });
+      toast.success("updated");
     },
   });
 
   // Handle form submission
   const onSubmit = (data) => {
     mutate(data);
+    // console.log(data);
   };
 
   if (isLoading) {
@@ -39,6 +42,7 @@ const Profile = () => {
   return (
     <div className="container mx-auto p-6">
       {/* Profile Display Section */}
+      <Toaster richColors position="bottom-right" />
       <div className="flex items-center space-x-4 mb-6">
         <img
           src={"https://randomuser.me/api/portraits/men/75.jpg"}
@@ -124,8 +128,9 @@ const Profile = () => {
 
         {/* Submit Button */}
         <button
+          disabled={isPending}
           type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+          className="disabled:bg-slate-500 w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
         >
           Save Changes
         </button>

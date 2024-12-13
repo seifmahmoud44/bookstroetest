@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { loginApi } from "../api/authApi";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const signupSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -100,7 +100,12 @@ const Signin = () => {
             </p>
           )}
         </div>
-
+        <Link
+          className="text-blue-700 cursor-pointer mb-3 block "
+          to={"/signup"}
+        >
+          Create new account
+        </Link>
         {/* Submit Button */}
         <button
           disabled={isPending}

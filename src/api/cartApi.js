@@ -5,8 +5,10 @@ export const addToCartApi = async (data) => {
   return response.data;
 };
 
-export const updateQuantityApi = async (data, id) => {
-  const response = await axiosClient.post(`cart/${id}`, data);
+export const updateQuantityApi = async (data) => {
+  console.log(data);
+
+  const response = await axiosClient.post(`cart/${data.id}`, data.formData);
   return response.data;
 };
 
